@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Soporte Beta</title>
+    <title>Chat IA Interactivo</title>
     <style>
         :root {
             --bg-dark: #121212;
@@ -393,11 +393,11 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label for="username">Usuario</label>
-                    <input type="text" id="username" class="form-control" required>
+                    <input type="text" id="username" class="form-control" autocomplete="username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Contraseña</label>
-                    <input type="password" id="password" class="form-control" required>
+                    <input type="password" id="password" class="form-control" autocomplete="current-password" required>
                 </div>
                 <button type="submit" class="login-button" id="loginButton">
                     <span id="loginText">Iniciar Sesión</span>
@@ -455,8 +455,8 @@
         // =============================================
         // CONFIGURACIÓN - CAMBIA ESTAS URLs
         // =============================================
-        const csvFilePath = 'https://raw.githubusercontent.com/FJCRNX/CHATIABETA/refs/heads/main/conocimiento.csv';
-        const usersJsonPath = 'https://raw.githubusercontent.com/FJCRNX/CHATIABETA/refs/heads/main/usuarios.json';
+        const csvFilePath = 'https://raw.githubusercontent.com/FJCRNX/CHATIABETA/main/conocimiento.csv';
+        const usersJsonPath = 'https://raw.githubusercontent.com/FJCRNX/CHATIABETA/main/usuarios.json';
         // =============================================
 
         // Función para cargar usuarios desde JSON
@@ -497,14 +497,11 @@
                 // CSV por defecto en caso de error
                 return `tema,tags,descripcion,pasos,areas_responsables
 traspaso,proceso,Proceso estándar de traspaso de productos entre almacenes,"1. Solicitar autorización del gerente de área;2. Completar formulario de traspaso en sistema;3. Verificar inventario físico;4. Actualizar sistema de inventarios;5. Notificar a todas las áreas involucradas","Gerencia,Almacén,Sistemas,Contabilidad"
-traspaso,problema,Problemas comunes en traspasos y sus soluciones,"1. Identificar el tipo de problema (faltante, sobrante, daño);2. Contactar al área correspondiente según el problema;3. Documentar la incidencia en el sistema;4. Seguir protocolo de solución específico;5. Realizar ajuste correspondiente","Soporte Técnico,Almacén,Calidad"
-traspaso,politica,Políticas y normativas de traspasos,"1. Revisar manual de políticas actualizado;2. Consultar con supervisor inmediato;3. Aplicar normativa vigente según el tipo de producto;4. Documentar cualquier excepción o caso especial;5. Archivar documentación según protocolo","Recursos Humanos,Gerencia,Legal"
-sistema,error,Resolución de errores del sistema,"1. Identificar el código y descripción del error;2. Revisar logs del sistema para diagnóstico;3. Contactar al administrador del sistema;4. Documentar pasos realizados para solución;5. Reportar error recurrente a desarrollo","Sistemas,Soporte Técnico"
-sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder a panel de administración con credenciales;2. Realizar cambios necesarios según requerimiento;3. Probar funcionalidad después de cada cambio;4. Documentar cambios realizados;5. Notificar a usuarios afectados","Sistemas,Administración"`;
+traspaso,problema,Problemas comunes en traspasos y sus soluciones,"1. Identificar el tipo de problema (faltante, sobrante, daño);2. Contactar al área correspondiente según el problema;3. Documentar la incidencia en el sistema;4. Seguir protocolo de solución específico;5. Realizar ajuste correspondiente","Soporte Técnico,Almacén,Calidad"`;
             }
         }
 
-        // Función para parsear CSV
+        // Función mejorada para parsear CSV
         function parseCSV(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim() !== '');
             if (lines.length < 2) {
@@ -516,34 +513,41 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
             const result = [];
             
             for (let i = 1; i < lines.length; i++) {
-                const obj = {};
-                let currentLine = lines[i];
+                const currentLine = lines[i];
                 
-                // Manejo de campos con comas internas
-                const regex = /(".*?"|[^",]+)(?=\s*,|\s*$)/g;
-                const matches = currentLine.match(regex);
+                // Manejo avanzado de campos con comas usando expresiones regulares
+                const regex = /(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))/g;
+                let matches = [];
+                let match;
                 
-                if (matches && matches.length === headers.length) {
+                while ((match = regex.exec(currentLine)) !== null) {
+                    if (match[0] === ',' || match[0] === '\n') continue;
+                    let value = match[1] || match[0];
+                    // Remover comillas si existen
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.substring(1, value.length - 1).replace(/""/g, '"');
+                    }
+                    matches.push(value.trim());
+                }
+                
+                if (matches.length === headers.length) {
+                    const obj = {};
                     for (let j = 0; j < headers.length; j++) {
-                        let value = matches[j].trim();
-                        // Remover comillas si existen
-                        if (value.startsWith('"') && value.endsWith('"')) {
-                            value = value.substring(1, value.length - 1);
-                        }
-                        obj[headers[j]] = value;
+                        obj[headers[j]] = matches[j];
                     }
                     
                     // Convertir pasos y áreas responsables a arrays
                     if (obj.pasos) {
-                        obj.pasos = obj.pasos.split(';').map(paso => paso.trim());
+                        obj.pasos = obj.pasos.split(';').map(paso => paso.trim()).filter(paso => paso);
                     }
                     if (obj.areas_responsables) {
-                        obj.areas_responsables = obj.areas_responsables.split(',').map(area => area.trim());
+                        obj.areas_responsables = obj.areas_responsables.split(',').map(area => area.trim()).filter(area => area);
                     }
                     
                     result.push(obj);
                 } else {
-                    console.warn('Línea CSV con formato incorrecto:', currentLine);
+                    console.warn('Línea CSV con formato incorrecto (esperados:', headers.length, 'obtenidos:', matches.length, '):', currentLine);
+                    console.warn('Matches:', matches);
                 }
             }
             
@@ -664,6 +668,11 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
                 console.log('Usuarios cargados:', usersDatabase.length);
                 console.log('Registros de conocimiento cargados:', knowledgeBase.length);
                 
+                // Mostrar primeros registros para debug
+                if (knowledgeBase.length > 0) {
+                    console.log('Primer registro de conocimiento:', knowledgeBase[0]);
+                }
+                
             } catch (error) {
                 console.error('Error inicializando la aplicación:', error);
             } finally {
@@ -744,6 +753,9 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
         function getResponseFromKnowledgeBase(query) {
             const cleanQuery = query.toLowerCase().trim();
             
+            console.log('Buscando respuesta para:', cleanQuery);
+            console.log('Base de conocimiento disponible:', knowledgeBase.length, 'registros');
+            
             // Si estamos en un contexto de opciones múltiples
             if (currentContext) {
                 const selectedOption = currentContext.options.find(option => 
@@ -785,25 +797,27 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
             
             // Buscar por tema principal
             const temas = [...new Set(knowledgeBase.map(item => item.tema))];
-            const temaEncontrado = temas.find(tema => cleanQuery.includes(tema));
+            const temaEncontrado = temas.find(tema => cleanQuery.includes(tema.toLowerCase()));
             
             if (temaEncontrado) {
                 const tagsRelacionados = knowledgeBase
                     .filter(item => item.tema === temaEncontrado)
                     .map(item => item.tags);
                 
-                if (tagsRelacionados.length > 1) {
+                const tagsUnicos = [...new Set(tagsRelacionados)];
+                
+                if (tagsUnicos.length > 1) {
                     return {
                         answer: `Encontré información sobre "${temaEncontrado}". ¿Qué aspecto específico necesitas?`,
-                        options: tagsRelacionados,
+                        options: tagsUnicos,
                         context: {
                             tema: temaEncontrado,
-                            options: tagsRelacionados
+                            options: tagsUnicos
                         }
                     };
-                } else if (tagsRelacionados.length === 1) {
+                } else if (tagsUnicos.length === 1) {
                     const match = knowledgeBase.find(item => 
-                        item.tema === temaEncontrado && item.tags === tagsRelacionados[0]
+                        item.tema === temaEncontrado && item.tags === tagsUnicos[0]
                     );
                     
                     if (match) {
@@ -818,7 +832,7 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
             
             // Buscar por tags directamente
             const matchesByTag = knowledgeBase.filter(item => 
-                cleanQuery.includes(item.tags) || item.tags.includes(cleanQuery)
+                cleanQuery.includes(item.tags.toLowerCase()) || item.tags.toLowerCase().includes(cleanQuery)
             );
             
             if (matchesByTag.length > 0) {
@@ -887,7 +901,7 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
             messageText.textContent = text;
             messageDiv.appendChild(messageText);
             
-            if (steps.length > 0) {
+            if (steps && steps.length > 0) {
                 const stepsDiv = document.createElement('div');
                 stepsDiv.className = 'step-by-step';
                 
@@ -901,14 +915,16 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
                 messageDiv.appendChild(stepsDiv);
             }
             
-            if (areas.length > 0) {
+            if (areas && areas.length > 0) {
                 const areasDiv = document.createElement('div');
                 areasDiv.style.marginTop = '10px';
+                areasDiv.style.fontSize = '0.9em';
+                areasDiv.style.color = 'var(--text-secondary)';
                 areasDiv.innerHTML = `<strong>Áreas responsables:</strong> ${areas.join(', ')}`;
                 messageDiv.appendChild(areasDiv);
             }
             
-            if (options.length > 0) {
+            if (options && options.length > 0) {
                 const optionsDiv = document.createElement('div');
                 optionsDiv.className = 'options-container';
                 
@@ -974,9 +990,8 @@ sistema,configuracion,Configuración y parametrización del sistema,"1. Acceder 
         // Inicialización cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
             loadChatHistory();
-            // No inicializamos todo hasta que se necesite (en el login)
+            console.log('Aplicación cargada, listo para iniciar sesión');
         });
     </script>
 </body>
-
 </html>
