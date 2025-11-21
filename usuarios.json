@@ -1,0 +1,44 @@
+[
+    {
+        "username": "admin",
+        "password": "admin123",
+        "name": "Administrador del Sistema",
+        "role": "admin",
+        "department": "Sistemas"
+    },
+    {
+        "username": "almacen",
+        "password": "almacen123",
+        "name": "Responsable de Almacén",
+        "role": "user",
+        "department": "Almacén"
+    },
+    {
+        "username": "soporte",
+        "password": "soporte123",
+        "name": "Técnico de Soporte",
+        "role": "support",
+        "department": "Soporte Técnico"
+    },
+    {
+        "username": "gerente",
+        "password": "gerente123",
+        "name": "Gerente General",
+        "role": "manager",
+        "department": "Gerencia"
+    },
+    {
+        "username": "rh",
+        "password": "rh123456",
+        "name": "Especialista de RH",
+        "role": "hr",
+        "department": "Recursos Humanos"
+    },
+    {
+        "username": "usuario",
+        "password": "123456",
+        "name": "Usuario Demo",
+        "role": "user",
+        "department": "Ventas"
+    }
+]
