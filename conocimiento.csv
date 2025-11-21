@@ -1,13 +1,13 @@
 tema,tags,descripcion,pasos,areas_responsables
-traspaso,proceso,Proceso  de traspaso de productos entre almacenes,"1. Confirmar con almacen suministrador
+traspaso,proceso,"Proceso de traspaso de productos entre almacenes","1. Confirmar con almacén suministrador
 2. Generar solicitud con referencia o sin referencia
 3. Verificar existencia y motivo de traspaso
-4. Coordeinar entrega
-5. Notificar a centro suministrador de la solicitud correo o whatsapp o llamada.",Almacen
-traspaso,problema,Problemas comunes en traspasos y sus soluciones,"1. Identificar el tipo de problema (faltante, sobrante, da o);
-2. Contactar a centro suministrador;
+4. Coordinar entrega
+5. Notificar al centro suministrador de la solicitud (correo, WhatsApp o llamada)","Almacén"
+traspaso,problema,"Problemas comunes en traspasos y sus soluciones","1. Identificar el tipo de problema (faltante, sobrante, daño);
+2. Contactar al centro suministrador;
 3. Documentar la incidencia en el sistema con chofer o almacenista;
-4. Obtener el seguimiento para concluirlo;
-5. Realizar los ajuste correspondiente y cerrar enviar correo si es un tema mas para validar a detalle.","Soporte Técnico,Almacén,Calidad"
-traspaso,politica,Politicas y normativas de traspasos,"1. Revisar manual de poli ticas actualizado;
-2. Solicitar Mejora continua acceso a portal documental y a Auditoria por correo;","Recursos Humanos,Gerencia,Legal"
+4. Dar seguimiento para concluirlo;
+5. Realizar los ajustes correspondientes y enviar correo si es un tema para validar a detalle.","Soporte Técnico,Almacén,Calidad"
+traspaso,politica,"Políticas y normativas de traspasos","1. Revisar manual de políticas actualizado;
+2. Solicitar a Mejora Continua acceso al portal documental y a Auditoría por correo.","Recursos Humanos,Gerencia,Legal"
