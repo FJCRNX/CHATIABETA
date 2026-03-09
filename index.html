@@ -3,105 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KURODA SOPORTE</title>
+    <title>KURODA SOPORTE DIGITAL BOT - V3</title>
     <style>
         :root {
             --bg-dark: #121212;
             --bg-card: #1e1e1e;
             --text-light: #f0f0f0;
+            --text-secondary: #b0b0b0;
             --accent-red: #c62828;
             --accent-red-dark: #8e0000;
             --border-white: rgba(255, 255, 255, 0.2);
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Contenedor Principal con Scroll Corregido */
+        /* Layout Principal */
         .container { flex: 1; display: flex; flex-direction: column; height: 100vh; max-width: 1400px; margin: 0 auto; padding: 20px; min-height: 0; }
         
+        header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-white); margin-bottom: 15px; }
+        .logo h1 { font-size: 1.5rem; }
+        .logo span { color: var(--accent-red); }
+
+        /* Contenedor de Chat y Scroll */
         .chat-container { 
             flex: 1; display: flex; flex-direction: column; 
-            border: 1px solid var(--border-white); border-radius: 10px; 
+            border: 1px solid var(--border-white); border-radius: 12px; 
             background-color: var(--bg-card); overflow: hidden; min-height: 0;
         }
 
         .chat-messages { 
             flex: 1; padding: 20px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 15px;
-            scrollbar-width: thin; scrollbar-color: var(--accent-red) transparent;
+            display: flex; flex-direction: column; gap: 20px;
+            scroll-behavior: smooth;
         }
 
-        /* UX DE COLUMNAS */
+        /* Burbujas y Columnas */
+        .message { max-width: 90%; line-height: 1.5; padding: 15px; border-radius: 10px; }
+        .user-message { align-self: flex-end; background: var(--accent-red-dark); border: 1px solid var(--accent-red); }
+        .bot-message { align-self: flex-start; background: rgba(255,255,255,0.05); width: 100%; border: 1px solid var(--border-white); }
+
         .solutions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px; margin-top: 15px; width: 100%;
         }
 
         .solution-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--accent-red);
-            padding: 20px; border-radius: 10px;
-            display: flex; flex-direction: column; transition: 0.3s;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--accent-red);
+            padding: 18px; border-radius: 10px; display: flex; flex-direction: column; transition: 0.3s;
         }
-        .solution-card:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
-        .solution-card h4 { color: var(--accent-red); margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; }
-        .solution-card p { font-size: 0.9rem; line-height: 1.5; color: #bbb; flex: 1; margin-bottom: 15px; }
+        .solution-card:hover { background: rgba(255, 255, 255, 0.07); transform: translateY(-3px); }
+        .solution-card h4 { color: var(--accent-red); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; }
+        .solution-card p { font-size: 0.85rem; color: #ccc; flex: 1; margin-bottom: 15px; }
 
         .btn-maximize {
             background: var(--accent-red); color: white; border: none;
             padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;
         }
 
-        /* INPUT FIX */
-        .chat-input-container { display: flex; padding: 15px; border-top: 1px solid var(--border-white); background: rgba(0,0,0,0.3); }
+        /* Input fijo abajo */
+        .chat-input-container { flex-shrink: 0; display: flex; padding: 15px; border-top: 1px solid var(--border-white); background: rgba(0,0,0,0.3); }
         .chat-input { flex: 1; padding: 12px 20px; border: 1px solid var(--border-white); border-radius: 25px; background: #2a2a2a; color: white; outline: none; }
         .send-button { margin-left: 10px; padding: 0 25px; background: var(--accent-red); border: none; border-radius: 25px; color: white; cursor: pointer; font-weight: bold; }
 
-        /* MODAL POPUP FULLSCREEN */
+        /* Historial Lateral */
+        .history-panel {
+            position: fixed; top: 0; right: -350px; width: 300px; height: 100vh;
+            background: var(--bg-card); border-left: 1px solid var(--border-white);
+            transition: 0.3s; z-index: 1000; padding: 20px;
+        }
+        .history-panel.open { right: 0; }
+        .history-item { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; font-size: 0.85rem; }
+
+        /* Login */
+        .login-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); display: flex; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .login-card { background: var(--bg-card); padding: 30px; border-radius: 10px; width: 350px; border: 1px solid var(--border-white); }
+
+        /* Modal Popup */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999;
+            background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 3000;
         }
         .modal-content {
             background: var(--bg-card); width: 90%; height: 85%; padding: 40px;
-            border-radius: 15px; border: 1px solid var(--accent-red); position: relative; overflow-y: auto;
+            border-radius: 15px; border: 1px solid var(--accent-red); overflow-y: auto; position: relative;
         }
         .close-modal { position: absolute; top: 20px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
-        /* LOGIN & HISTORY (Mantenidos de tu archivo original) */
         .hidden { display: none !important; }
-        .login-container { display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-card { background: var(--bg-card); padding: 30px; border-radius: 10px; width: 400px; border: 1px solid var(--border-white); }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="login-container">
+    <div id="loginScreen" class="login-overlay">
         <div class="login-card">
-            <h2 style="text-align:center; margin-bottom:20px;">KURODA SOPORTE <span>IA</span></h2>
-            <form id="loginForm">
-                <input type="text" id="username" placeholder="Usuario" style="width:100%; padding:10px; margin-bottom:10px; background:#333; color:white; border:1px solid #444;">
-                <input type="password" id="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:20px; background:#333; color:white; border:1px solid #444;">
-                <button type="submit" style="width:100%; padding:12px; background:var(--accent-red); color:white; border:none; border-radius:5px; cursor:pointer;">Entrar</button>
-            </form>
+            <h2 style="text-align:center; margin-bottom:20px;">KURODA <span>SOPORTE</span></h2>
+            <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444;">
+            <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:20px; background:#222; color:white; border:1px solid #444;">
+            <button id="loginBtn" style="width:100%; padding:12px; background:var(--accent-red); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">ACCEDER</button>
         </div>
     </div>
 
-    <div id="chatScreen" class="container hidden">
-        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-white); padding-bottom:10px;">
-            <h2>Soporte Kuroda <span>Bot</span></h2>
-            <div id="userNameDisplay"></div>
+    <div id="mainApp" class="container hidden">
+        <header>
+            <div class="logo"><h1>Soporte <span>IA</span></h1></div>
+            <button id="openHistory" style="background:none; border:none; color:white; cursor:pointer;">🕒 Historial</button>
         </header>
 
         <div class="chat-container">
-            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">Hola soy TIko Soporte Digital de Kuroda. ¿En qué manual puedo ayudarte hoy?</div>
+            </div>
             <div class="chat-input-container">
-                <input type="text" id="chatInput" class="chat-input" placeholder="Consultar procesos o manuales...">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu consulta aquí..." autocomplete="off">
                 <button id="sendBtn" class="send-button">Enviar</button>
             </div>
         </div>
+    </div>
+
+    <div id="historyPanel" class="history-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3>Consultas</h3>
+            <button id="closeHistory" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="historyList"></div>
     </div>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -112,71 +140,70 @@
     </div>
 
     <script>
-        const N8N_WEBHOOK = 'https://n8n.happything.com.mx/webhook/6e16c5ff-eed5-44e2-ab02-76e12fb7934f/chat';
+        const N8N_URL = 'https://n8n.happything.com.mx/webhook/6e16c5ff-eed5-44e2-ab02-76e12fb7934f/chat';
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
+        const historyList = document.getElementById('historyList');
         const modal = document.getElementById('modalOverlay');
 
-        // Lógica de Login Simple
-        document.getElementById('loginForm').onsubmit = (e) => {
-            e.preventDefault();
+        // Manejo de Login
+        document.getElementById('loginBtn').onclick = () => {
             document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('chatScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
         };
 
+        // Enviar Mensaje
         async function handleSend() {
             const query = chatInput.value.trim();
             if(!query) return;
 
-            appendMessage(query, 'user');
+            appendMsg(query, 'user');
             chatInput.value = '';
 
-            // Loading
             const loadId = 'loading-' + Date.now();
             const loadDiv = document.createElement('div');
             loadDiv.id = loadId;
             loadDiv.className = 'message bot-message';
-            loadDiv.innerHTML = '<i>Procesando consulta...</i>';
+            loadDiv.innerHTML = '<i>Buscando en base de conocimientos...</i>';
             chatMessages.appendChild(loadDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                const response = await fetch(N8N_WEBHOOK, {
+                const response = await fetch(N8N_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chatInput: query, sessionId: "kuroda-user" })
+                    body: JSON.stringify({ chatInput: query, sessionId: "kuroda-session" })
                 });
                 const data = await response.json();
                 document.getElementById(loadId).remove();
 
-                const botText = data.output || data.text || "No se encontró información.";
-                renderSmartResponse(botText);
+                const botResponse = data.output || data.text || "Sin respuesta del sistema.";
+                renderSmartResponse(botResponse, query);
             } catch (err) {
-                document.getElementById(loadId).innerText = "Error de conexión.";
+                document.getElementById(loadId).innerText = "Error de red.";
             }
         }
 
-        function renderSmartResponse(text) {
+        // PROCESAMIENTO UX INTELIGENTE
+        function renderSmartResponse(text, query) {
             const botMsgDiv = document.createElement('div');
             botMsgDiv.className = 'message bot-message';
-            botMsgDiv.style.width = "100%";
 
-            // 1. Limpiar introducción y conclusión
-            // Regex para capturar Título entre ** y el contenido hasta el siguiente **
+            // Regex para detectar patrones **TITULO**
             const regex = /\*\*([^*]+)\*\*:?\s*([^*]+(?:\*[^*]+\*[^*]+)*)/g;
             let matches = [...text.matchAll(regex)];
 
             if (matches.length > 0) {
-                // Agregar texto introductorio si existe
                 const intro = text.split('**')[0].trim();
                 if(intro) {
                     const p = document.createElement('p');
+                    p.style.color = "var(--accent-red)";
+                    p.style.fontWeight = "bold";
+                    p.style.marginBottom = "10px";
                     p.innerText = intro;
-                    p.style.marginBottom = "15px";
                     botMsgDiv.appendChild(p);
                 }
 
-                // Crear Grid de Columnas
                 const grid = document.createElement('div');
                 grid.className = 'solutions-grid';
 
@@ -188,59 +215,57 @@
                     card.className = 'solution-card';
                     card.innerHTML = `
                         <h4>${title}</h4>
-                        <p>${content.substring(0, 180)}...</p>
-                        <button class="btn-maximize" onclick="maximize('${title.replace(/'/g, "\\'")}', '${content.replace(/'/g, "\\'").replace(/\n/g, "<br>")}')">Ver Manual Completo</button>
+                        <p>${content.substring(0, 160)}...</p>
+                        <button class="btn-maximize" onclick="openPopup('${title.replace(/'/g, "\\'")}', '${content.replace(/'/g, "\\'").replace(/\n/g, "<br>")}')">Maximizar Manual</button>
                     `;
                     grid.appendChild(card);
                 });
                 botMsgDiv.appendChild(grid);
-
-                const lastMatch = matches[matches.length - 1];
-                const lastIndex = text.lastIndexOf(lastMatch[0]) + lastMatch[0].length;
-                const outro = text.substring(lastIndex).trim();
-                if(outro && outro.length > 5) {
-                    const pOutro = document.createElement('p');
-                    pOutro.style.marginTop = "15px";
-                    pOutro.innerText = outro;
-                    botMsgDiv.appendChild(pOutro);
-                }
             } else {
                 botMsgDiv.innerText = text;
             }
 
             chatMessages.appendChild(botMsgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            saveHistory(query, text);
+            
+            // Fix de Scroll: Esperar a que el DOM pinte las tarjetas
+            setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 100);
         }
 
-        function maximize(title, content) {
+        function openPopup(title, content) {
             document.getElementById('modalBody').innerHTML = `
-                <h1 style="color:var(--accent-red); margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">${title}</h1>
-                <div style="font-size:1.1rem; line-height:1.8; color:#eee;">${content}</div>
+                <h2 style="color:var(--accent-red); margin-bottom:20px; border-bottom:1px solid #444; padding-bottom:10px;">${title}</h2>
+                <div style="line-height:1.8; font-size:1.15rem; white-space:pre-wrap;">${content.replace(/<br>/g, '\n')}</div>
             `;
             modal.style.display = 'flex';
         }
 
-        function appendMessage(text, type) {
+        function appendMsg(text, type) {
             const div = document.createElement('div');
             div.className = `message ${type}-message`;
-            div.style.padding = "12px 20px";
-            div.style.borderRadius = "15px";
-            div.style.marginBottom = "10px";
-            div.style.alignSelf = type === 'user' ? 'flex-end' : 'flex-start';
-            div.style.backgroundColor = type === 'user' ? 'var(--accent-red-dark)' : 'rgba(255,255,255,0.05)';
             div.textContent = text;
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        function saveHistory(q, a) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `<strong>${q.substring(0, 30)}...</strong><br><small>${new Date().toLocaleTimeString()}</small>`;
+            item.onclick = () => { renderSmartResponse(a, q); document.getElementById('historyPanel').classList.remove('open'); };
+            historyList.prepend(item);
+        }
+
+        // Eventos de UI
         document.getElementById('sendBtn').onclick = handleSend;
         chatInput.onkeypress = (e) => { if(e.key === 'Enter') handleSend(); };
+        document.getElementById('openHistory').onclick = () => document.getElementById('historyPanel').classList.add('open');
+        document.getElementById('closeHistory').onclick = () => document.getElementById('historyPanel').classList.remove('open');
         document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
         window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; };
     </script>
 </body>
 </html>
-
 
 
 
