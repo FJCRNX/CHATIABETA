@@ -1,0 +1,52 @@
+[
+  {
+    "codigo": "PROD-001",
+    "descripcion": "Cable HDMI de Alta Velocidad 2m",
+    "existencia": 150
+  },
+  {
+    "codigo": "PROD-002",
+    "descripcion": "Mouse Óptico Inalámbrico Ergonómico",
+    "existencia": 85
+  },
+  {
+    "codigo": "PROD-003",
+    "descripcion": "Teclado Mecánico RGB Switch Azul",
+    "existencia": 42
+  },
+  {
+    "codigo": "PROD-004",
+    "descripcion": "Monitor LED 24 Pulgadas Full HD",
+    "existencia": 19
+  },
+  {
+    "codigo": "PROD-005",
+    "descripcion": "Auriculares Diadema con Micrófono",
+    "existencia": 64
+  },
+  {
+    "codigo": "PROD-006",
+    "descripcion": "Memoria USB 64GB USB 3.0",
+    "existencia": 210
+  },
+  {
+    "codigo": "PROD-007",
+    "descripcion": "Disco Duro Externo 1TB",
+    "existencia": 33
+  },
+  {
+    "codigo": "PROD-008",
+    "descripcion": "Adaptador USB-C a Ethernet",
+    "existencia": 95
+  },
+  {
+    "codigo": "PROD-009",
+    "descripcion": "Cargador Rápido de Pared 20W",
+    "existencia": 120
+  },
+  {
+    "codigo": "PROD-010",
+    "descripcion": "Soporte de Aluminio para Laptop",
+    "existencia": 50
+  }
+]
